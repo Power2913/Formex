@@ -1,0 +1,21 @@
+  {
+    "manifest_version": 3,
+    "name": "SEO Form Autofill",
+    "version": "1.0",
+    "description": "Store and autofill user details into web forms.",
+    "permissions": ["storage", "activeTab", "scripting"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon16.png"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["./content.js"]
+      }
+    ]
+  }
+  

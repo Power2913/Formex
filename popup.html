@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO Autofill Extension</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="mainMenu">
+    <h1 class="fs-2 fw-normal text-center text-white">FormeX</h1> 
+    <button id="btnDetails">Details</button>
+    <button id="btnAutofill">Auto Fill Details</button>
+    <p class="fs-6 fw-normal text-white mt-3">
+      This Chrome extension streamlines form-filling for SEO tasks by securely storing
+      user details like Name, Email, Password, Company, and social media links. 
+      It features two main options:
+    </p>
+  </div>
+
+  <div id="detailsSection" style="display: none;">
+    <h3>Update Your Details</h3>
+    <form id="userDetailsForm">
+      <label>First Name: <input type="text" id="firstName"></label>
+      <label>Last Name: <input type="text" id="lastName"></label>
+      <label>Email Address: <input type="email" id="email"></label>
+      <label>Password: <input type="password" id="password"></label>
+      <label>Confirm Address: <input type="text" id="confirmAddress"></label>
+      <label>Company Name: <input type="text" id="companyName"></label>
+      <label>Company URL (Custom URL): <input type="url" id="companyURL"></label>
+      <label>Instagram Link: <input type="url" id="instagramLink"></label>
+      <label>Twitter Link: <input type="url" id="twitterLink"></label>
+      <label>YouTube Link: <input type="url" id="youtubeLink"></label>
+      <label>LinkedIn Link: <input type="url" id="linkedinLink"></label>
+      <button type="submit">Save</button>
+    </form>
+    <button id="btnBack">Back</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
