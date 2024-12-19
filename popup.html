@@ -9,6 +9,19 @@
 </head>
 <body>
   <div id="mainMenu">
+    <h1 class="fs-2 fw-normal text-center text-white">FormeX</h1>
+    <label for="profileSelector" class="text-white">Select Profile:</label>
+    <select id="profileSelector"></select>
+    <button id="btnDetails">Details</button>
+    <button id="btnAutofill">Auto Fill Details</button>
+    <button id="loadDynamicDataBtn">Load Dynamic Data</button>
+    <p class="fs-6 fw-normal text-white mt-3">
+      This Chrome extension streamlines form-filling for SEO tasks by securely storing
+      user details like Name, Email, Password, Company, and social media links. 
+      It features two main options:
+    </p>
+  </div>
+  <!-- <div id="mainMenu">
     <h1 class="fs-2 fw-normal text-center text-white">FormeX</h1> 
     <button id="btnDetails">Details</button>
     <button id="btnAutofill">Auto Fill Details</button>
@@ -17,28 +30,52 @@
       user details like Name, Email, Password, Company, and social media links. 
       It features two main options:
     </p>
-  </div>
+  </div> -->
 
   <div id="detailsSection" style="display: none;">
     <h3>Update Your Details</h3>
     <form id="userDetailsForm">
-      <label>First Name: <input type="text" id="firstName"></label>
-      <label>Last Name: <input type="text" id="lastName"></label>
-      <label>Email Address: <input type="email" id="email"></label>
-      <label>Password: <input type="password" id="password"></label>
-      <label>Confirm Address: <input type="text" id="confirmAddress"></label>
-      <label>Company Name: <input type="text" id="companyName"></label>
-      <label>Company URL (Custom URL): <input type="url" id="companyURL"></label>
-      <label>Instagram Link: <input type="url" id="instagramLink"></label>
-      <label>Twitter Link: <input type="url" id="twitterLink"></label>
-      <label>YouTube Link: <input type="url" id="youtubeLink"></label>
-      <label>LinkedIn Link: <input type="url" id="linkedinLink"></label>
+      <!-- Input fields here -->
+      <label class="text-white">First Name: <input type="text" id="firstName" placeholder="First Name"></label>
+      <label class="text-white">Last Name: <input type="text" id="lastName" placeholder="Last Name"></label>
+      <label class="text-white">Username: <input type="text" id="username" placeholder="Username"></label>
+      <label class="text-white">Email Address: <input type="email" id="email" placeholder="E-mail"></label>
+      <label class="text-white">Phone Number: <input type="tel" id="phone" placeholder="Phone"></label>
+      <label class="text-white">Password: <input type="password" id="password" placeholder="Password"></label>
+      <label class="text-white">Address: <input type="text" id="confirmAddress" placeholder="Address"></label>
+      <label class="text-white">Company Name: <input type="text" id="companyName" placeholder="Company Name"></label>
+      <label class="text-white">Company URL (Custom URL): <input type="url" id="companyURL" placeholder="Company Url"></label>
+      <label class="text-white">Instagram Link: <input type="url" id="instagramLink" placeholder="Instagram Link"></label>
+      <label class="text-white">Twitter Link: <input type="url" id="twitterLink" placeholder="Twitter Link"></label>
+      <label class="text-white">YouTube Link: <input type="url" id="youtubeLink" placeholder="Youtube Link"></label>
+      <label class="text-white">LinkedIn Link: <input type="url" id="linkedinLink" placeholder="LinkedIn Link"></label>
       <button type="submit">Save</button>
     </form>
     <button id="btnBack">Back</button>
   </div>
 
+  <!-- <div id="detailsSection" style="display: none;">
+    <h3>Update Your Details</h3>
+    <form id="userDetailsForm">
+      <label class="text-white">First Name: <input type="text" id="firstName" placeholder="First Name"></label>
+      <label class="text-white">Last Name: <input type="text" id="lastName" placeholder="Last Name"></label>
+      <label class="text-white">Username: <input type="text" id="username" placeholder="Username"></label>
+      <label class="text-white">Email Address: <input type="email" id="email" placeholder="E-mail"></label>
+      <label class="text-white">Phone Number: <input type="tel" id="phone" placeholder="Phone"></label>
+      <label class="text-white">Password: <input type="password" id="password" placeholder="Password"></label>
+      <label class="text-white">Address: <input type="text" id="confirmAddress" placeholder="Address"></label>
+      <label class="text-white">Company Name: <input type="text" id="companyName" placeholder="Company Name"></label>
+      <label class="text-white">Company URL (Custom URL): <input type="url" id="companyURL" placeholder="Company Url"></label>
+      <label class="text-white">Instagram Link: <input type="url" id="instagramLink" placeholder="Instagram Link"></label>
+      <label class="text-white">Twitter Link: <input type="url" id="twitterLink" placeholder="Twitter Link"></label>
+      <label class="text-white">YouTube Link: <input type="url" id="youtubeLink" placeholder="Youtube Link"></label>
+      <label class="text-white">LinkedIn Link: <input type="url" id="linkedinLink" placeholder="LinkedIn Link"></label>
+      <button type="submit">Save</button>
+    </form>
+    <button id="btnBack">Back</button>
+  </div> -->
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-  <script src="popup.js"></script>
+  <script src="/popup.js"></script>
 </body>
 </html>
