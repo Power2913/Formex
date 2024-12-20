@@ -1,255 +1,237 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const mainMenu = document.getElementById("mainMenu");
+  const detailsSection = document.getElementById("detailsSection");
+  const btnDetails = document.getElementById("btnDetails");
+  const btnAutofill = document.getElementById("btnAutofill");
+  const btnBack = document.getElementById("btnBack");
+  const userDetailsForm = document.getElementById("userDetailsForm");
   const profileSelector = document.getElementById("profileSelector");
+  const btnAddProfile = document.getElementById("btnAddProfile");
+  const btnDeleteProfile = document.getElementById("btnDeleteProfile");
 
-  // Load saved profiles from storage
-  chrome.storage.local.get("profiles", ({ profiles }) => {
-    if (profiles) {
-      for (const profileName in profiles) {
+  let currentProfile = null;
+
+  // Load profiles and populate dropdown
+  function loadProfiles() {
+    chrome.storage.local.get("profiles", ({ profiles }) => {
+      profiles = profiles || {};
+      profileSelector.innerHTML = "";
+
+      // Populate dropdown
+      Object.keys(profiles).forEach((profileName) => {
         const option = document.createElement("option");
         option.value = profileName;
         option.textContent = profileName;
         profileSelector.appendChild(option);
-      }
-    }
-  });
-
-  profileSelector.addEventListener("change", (e) => {
-    const selectedProfile = e.target.value;
-    loadUserDetails(selectedProfile);
-  });
-
-  // Event listener for Details button
-  document.getElementById("btnDetails").addEventListener("click", () => {
-    document.getElementById("mainMenu").style.display = "none";
-    document.getElementById("detailsSection").style.display = "block";
-  });
-
-  // Go back to Main Menu
-  document.getElementById("btnBack").addEventListener("click", () => {
-    document.getElementById("detailsSection").style.display = "none";
-    document.getElementById("mainMenu").style.display = "block";
-  });
-
-  // Save user details
-  document.getElementById("userDetailsForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const selectedProfile = profileSelector.value;
-
-    const userDetails = {
-      firstName: document.getElementById("firstName").value,
-      lastName: document.getElementById("lastName").value,
-      username: document.getElementById("username").value,
-      phone: document.getElementById("phone").value,
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value,
-      confirmAddress: document.getElementById("confirmAddress").value,
-      companyName: document.getElementById("companyName").value,
-      companyURL: document.getElementById("companyURL").value,
-      instagramLink: document.getElementById("instagramLink").value,
-      twitterLink: document.getElementById("twitterLink").value,
-      youtubeLink: document.getElementById("youtubeLink").value,
-      linkedinLink: document.getElementById("linkedinLink").value,
-    };
-
-    // Save the user details under the selected profile
-    chrome.storage.local.get("profiles", ({ profiles }) => {
-      if (!profiles) {
-        profiles = {};
-      }
-
-      profiles[selectedProfile] = userDetails;
-      chrome.storage.local.set({ profiles }, () => {
-        alert(`Details saved for profile: ${selectedProfile}`);
       });
-    });
-  });
 
-  // Autofill event
-  document.getElementById("btnAutofill").addEventListener("click", () => {
-    const selectedProfile = profileSelector.value;
-
-    chrome.storage.local.get("profiles", ({ profiles }) => {
-      if (profiles && profiles[selectedProfile]) {
-        autofillDetails(profiles[selectedProfile]);
-      } else {
-        alert("No details found. Please save a profile first.");
+      // Set current profile to the first profile
+      if (Object.keys(profiles).length > 0) {
+        currentProfile = profileSelector.value;
+        populateFormDetails(); // Populate form for the current profile
       }
     });
-  });
-});
+  }
 
-// Load user details based on selected profile
-function loadUserDetails(selectedProfile) {
-  chrome.storage.local.get("profiles", ({ profiles }) => {
-    if (profiles && profiles[selectedProfile]) {
-      const userDetails = profiles[selectedProfile];
+  // Populate form with details of the current profile
+  function populateFormDetails() {
+    if (!currentProfile) return;
+
+    chrome.storage.local.get("profiles", ({ profiles }) => {
+      const userDetails = profiles[currentProfile] || {};
+
+      // Update form fields with userDetails
       document.getElementById("firstName").value = userDetails.firstName || "";
       document.getElementById("lastName").value = userDetails.lastName || "";
       document.getElementById("username").value = userDetails.username || "";
-      document.getElementById("phone").value = userDetails.phone || "";
       document.getElementById("email").value = userDetails.email || "";
+      document.getElementById("phone").value = userDetails.phone || "";
       document.getElementById("password").value = userDetails.password || "";
-      document.getElementById("confirmAddress").value = userDetails.confirmAddress || "";
-      document.getElementById("companyName").value = userDetails.companyName || "";
+      document.getElementById("confirmAddress").value =
+        userDetails.confirmAddress || "";
+      document.getElementById("companyName").value =
+        userDetails.companyName || "";
       document.getElementById("companyURL").value = userDetails.companyURL || "";
-      document.getElementById("instagramLink").value = userDetails.instagramLink || "";
-      document.getElementById("twitterLink").value = userDetails.twitterLink || "";
-      document.getElementById("youtubeLink").value = userDetails.youtubeLink || "";
-      document.getElementById("linkedinLink").value = userDetails.linkedinLink || "";
-    } else {
-      alert("No profile found.");
-    }
-  });
-}
+      document.getElementById("instagramLink").value =
+        userDetails.instagramLink || "";
+      document.getElementById("twitterLink").value =
+        userDetails.twitterLink || "";
+      document.getElementById("youtubeLink").value =
+        userDetails.youtubeLink || "";
+      document.getElementById("facebookLink").value =
+        userDetails.facebookLink || "";
+      document.getElementById("linkedinLink").value =
+        userDetails.linkedinLink || "";
+    });
+  }
 
-// Autofill function
-function autofillDetails(userDetails) {
-  document.querySelectorAll("input, textarea, select").forEach((field) => {
-    const fieldIdentifier = (field.name || field.id || field.placeholder || "").toLowerCase();
+  // Add a new profile
+  btnAddProfile.addEventListener("click", () => {
+    const profileName = prompt("Enter new profile name:");
+    if (!profileName) return;
 
-    for (const [key, aliases] of Object.entries(fieldMappings)) {
-      if (aliases.some(alias => fieldIdentifier.includes(alias))) {
-        field.value = userDetails[key] || "";
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-        field.dispatchEvent(new Event("change", { bubbles: true }));
-        field.dispatchEvent(new Event("blur", { bubbles: true }));
-        break;
+    chrome.storage.local.get("profiles", ({ profiles }) => {
+      profiles = profiles || {};
+
+      if (profiles[profileName]) {
+        alert("Profile name already exists!");
+        return;
       }
-    }
-  });
-}
 
-document.getElementById("loadDynamicDataBtn").addEventListener("click", () => {
-  fetch("https://api.example.com/user-details")
-    .then(response => response.json())
-    .then(data => {
-      const selectedProfile = profileSelector.value;
-      chrome.storage.local.set({ [selectedProfile]: data }, () => {
-        alert("Dynamic data loaded and saved!");
-        loadUserDetails(selectedProfile);
+      profiles[profileName] = {}; // Initialize profile
+      chrome.storage.local.set({ profiles }, () => {
+        alert("Profile added successfully!");
+        loadProfiles();
       });
-    })
-    .catch(error => console.error("Error fetching dynamic data:", error));
-});
+    });
+  });
 
+  // Delete the selected profile
+  btnDeleteProfile.addEventListener("click", () => {
+    if (!currentProfile) {
+      alert("No profile selected!");
+      return;
+    }
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   const mainMenu = document.getElementById("mainMenu");
-//   const detailsSection = document.getElementById("detailsSection");
+    if (!confirm(`Are you sure you want to delete profile "${currentProfile}"?`))
+      return;
 
-//   const btnDetails = document.getElementById("btnDetails");
-//   const btnAutofill = document.getElementById("btnAutofill");
-//   const btnBack = document.getElementById("btnBack");
+    chrome.storage.local.get("profiles", ({ profiles }) => {
+      delete profiles[currentProfile];
+      chrome.storage.local.set({ profiles }, () => {
+        alert("Profile deleted successfully!");
+        loadProfiles();
+      });
+    });
+  });
 
-//   // Show Details section
-//   btnDetails.addEventListener("click", () => {
-//     mainMenu.style.display = "none";
-//     detailsSection.style.display = "block";
-//     loadUserDetails();
-//   });
+  // Save user details for the selected profile
+  userDetailsForm.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-//   // Go back to Main Menu
-//   btnBack.addEventListener("click", () => {
-//     detailsSection.style.display = "none";
-//     mainMenu.style.display = "block";
-//   });
+    if (!currentProfile) {
+      alert("No profile selected!");
+      return;
+    }
 
-//   document.getElementById("userDetailsForm").addEventListener("submit", (e) => {
-//     e.preventDefault();
+    const userDetails = {
+      fullName: document.getElementById("fullName").value.trim(),
+      firstName: document.getElementById("firstName").value.trim(),
+      lastName: document.getElementById("lastName").value.trim(),
+      username: document.getElementById("username").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      password: document.getElementById("password").value.trim(),
+      confirmPassword: document.getElementById("confirmPassword").value.trim(),
+      address: document.getElementById("address").value.trim(),
+      city: document.getElementById("city").value.trim(),
+      country: document.getElementById("country").value.trim(),
+      companyName: document.getElementById("companyName").value.trim(),
+      companyURL: document.getElementById("companyURL").value.trim(),
+      instagramLink: document.getElementById("instagramLink").value.trim(),
+      twitterLink: document.getElementById("twitterLink").value.trim(),
+      youtubeLink: document.getElementById("youtubeLink").value.trim(),
+      facebookLink: document.getElementById("facebookLink").value.trim(),
+      linkedinLink: document.getElementById("linkedinLink").value.trim(),
+    };
 
-//     const userDetails = {
-//       firstName: document.getElementById("firstName").value,
-//       lastName: document.getElementById("lastName").value,
-//       username: document.getElementById("username").value,
-//       phone: document.getElementById("phone").value,
-//       email: document.getElementById("email").value,
-//       password: document.getElementById("password").value,
-//       confirmAddress: document.getElementById("confirmAddress").value,
-//       companyName: document.getElementById("companyName").value,
-//       companyURL: document.getElementById("companyURL").value,
-//       instagramLink: document.getElementById("instagramLink").value,
-//       twitterLink: document.getElementById("twitterLink").value,
-//       youtubeLink: document.getElementById("youtubeLink").value,
-//       linkedinLink: document.getElementById("linkedinLink").value,
-//     };
+    chrome.storage.local.get("profiles", ({ profiles }) => {
+      profiles = profiles || {};
+      profiles[currentProfile] = userDetails;
 
-//     chrome.storage.local.set({ userDetails }, () => {
-//       alert("Details saved!");
-//     });
-//   });
+      chrome.storage.local.set({ profiles }, () => {
+        alert("Details saved successfully for profile: " + currentProfile);
+      });
+    });
+  });
 
-//   // Autofill Details button functionality
-//   btnAutofill.addEventListener("click", () => {
-//     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-//       chrome.scripting.executeScript({
-//         target: { tabId: tabs[0].id },
-//         function: autofillDetails,
-//       });
-//     });
-//   });
-
-//   // Load saved user details into the form
-//   function loadUserDetails() {
-//     chrome.storage.local.get("userDetails", ({ userDetails }) => {
-//       if (userDetails) {
-//         document.getElementById("firstName").value = userDetails.firstName || "";
-//         document.getElementById("lastName").value = userDetails.lastName || "";
-//         document.getElementById("username").value = userDetails.userName || "";
-//         document.getElementById("phone").value = userDetails.phone || "";
-//         document.getElementById("email").value = userDetails.email || "";
-//         document.getElementById("password").value = userDetails.password || "";
-//         document.getElementById("confirmAddress").value = userDetails.confirmAddress || "";
-//         document.getElementById("companyName").value = userDetails.companyName || "";
-//         document.getElementById("companyURL").value = userDetails.companyURL || "";
-//         document.getElementById("instagramLink").value = userDetails.instagramLink || "";
-//         document.getElementById("twitterLink").value = userDetails.twitterLink || "";
-//         document.getElementById("youtubeLink").value = userDetails.youtubeLink || "";
-//         document.getElementById("linkedinLink").value = userDetails.linkedinLink || "";
-//       }
-//     });
-//   }
-// });
-
-// function autofillDetails() {
-//   const fieldMappings = {
-//     fullName: ["full_name", "login", "pw"],
-//     firstName: ["first_name", "fname", "firstname", "givenname", "logusr"],
-//     lastName: ["last_name", "lname", "lastname", "surname"],
-//     username: ["username", "user_name", "uname"],
-//     email: ["email", "email_address", "user_email", "new_email"],
-//     phone: ["phone", "phone_number", "contact_number"],
-//     password: ["password", "passwd", "user_password", "logpwd"],
-//     confirmAddress: ["address", "user_address", "confirm_address"],
-//     companyName: ["company", "company_name", "org_name"],
-//     companyURL: ["website", "site_url", "company_url"],
-//     instagramLink: ["instagram", "instagram_link", "ig_link"],
-//     twitterLink: ["twitter", "twitter_link", "tw_link"],
-//     youtubeLink: ["youtube", "youtube_link", "yt_link"],
-//     linkedinLink: ["linkedin", "linkedin_link", "li_link"],
-//   };
+  // Autofill details for the selected profile
+  btnAutofill.addEventListener("click", () => {
+    if (!currentProfile) {
+      alert("No profile selected!");
+      return;
+    }
   
-//   chrome.storage.local.get("userDetails", ({ userDetails }) => {
-//     if (userDetails) {
-//       document.querySelectorAll("input, textarea").forEach((field) => {
-//         // Combine name, id, and placeholder for matching
-//         const fieldIdentifier = (field.name || field.id || field.placeholder || "").toLowerCase();
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: autofillDetails,
+        args: [currentProfile], // Pass the selected profile to the injected script
+      });
+    });
+  });
 
-//         // Match against defined aliases
-//         for (const [key, aliases] of Object.entries(fieldMappings)) {
-//           if (aliases.includes(fieldIdentifier)) {
-//             field.value = userDetails[key] || "";
 
-//             field.dispatchEvent(new Event("input", {bubbles: true}));
-//             field.dispatchEvent(new Event("input", { bubbles: true }));
-//             field.dispatchEvent(new Event("change", { bubbles: true }));
-//             field.dispatchEvent(new Event("blur", { bubbles: true }));
-//             break;
-//           }
-//         }
-//       });
-//     } else {
-//       alert("No details found. Please save them first.");
-//     }
-//   });
-// }
+  function autofillDetails(profileName) {
+
+    const fieldMappings = {
+      firstName: ["first_name", "fname", "firstname", "givenname", "logusr", "reg_first_name"],
+      lastName: ["last_name", "lname", "lastname", "surname", "reg_last_name"],
+      username: ["username", "user_name", "uname", "reg_username", "reg_nickname", "nickname"],
+      email: ["email", "email_address", "user_email", "reg_email"],
+      phone: ["phone", "phone_number", "contact_number", "number"],
+      password: ["password", "password1", "passwd", "user_password", "logpwd", "reg_password", "pass1"],
+      confirmPassword: ["pass2", "confirm_password", "conf_pass", "user_confirm_password", "password2"],
+      address: ["address", "user_address", "confirm_address"],
+      companyName: ["company", "company_name", "org_name"],
+      companyURL: ["website", "site_url", "company_url", "reg_website"],
+      instagramLink: ["instagram", "instagram_link", "ig_link"],
+      twitterLink: ["twitter", "twitter_link", "tw_link"],
+      youtubeLink: ["youtube", "youtube_link", "yt_link"],
+      facebookLink: ["facebook", "fb_link", "facebook_link", "fb"],
+      linkedinLink: ["linkedin", "linkedin_link", "li_link"],
+    };
+  
+    chrome.storage.local.get("profiles", ({ profiles }) => {
+      const userDetails = profiles[profileName];
+  
+      if (!userDetails) {
+        alert(`No details found for profile "${profileName}". Please save them first.`);
+        return;
+      }
+  
+      document.querySelectorAll("input, textarea").forEach((field) => {
+        const fieldIdentifier = (field.name || field.id || field.placeholder || "").toLowerCase();
+  
+        for (const [key, aliases] of Object.entries(fieldMappings)) {
+          if (aliases.includes(fieldIdentifier)) {
+            field.value = userDetails[key] || "";
+  
+            // Trigger input events to ensure forms detect the change
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+            field.dispatchEvent(new Event("blur", { bubbles: true }));
+            break;
+          }
+        }
+      });
+    });
+  }
+
+  // Update current profile and populate form on dropdown change
+  profileSelector.addEventListener("change", () => {
+    currentProfile = profileSelector.value;
+    populateFormDetails();
+  });
+
+  // Show Details section and populate form
+  btnDetails.addEventListener("click", () => {
+    if (!currentProfile) {
+      alert("No profile selected!");
+      return;
+    }
+
+    mainMenu.style.display = "none";
+    detailsSection.style.display = "block";
+    populateFormDetails();
+  });
+
+  // Back button functionality
+  btnBack.addEventListener("click", () => {
+    mainMenu.style.display = "block";
+    detailsSection.style.display = "none";
+  });
+
+  // Initial load
+  loadProfiles();
+});
